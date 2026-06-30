@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Rocket - Learn AI Design system.</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-800-normal.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'sans-serif'] },
+      colors: {
+        background: '#08020e',
+        card: '#0d0514',
+        'violet-100': '#ece6ff',
+        'muted-foreground': 'rgb(150, 156, 177)',
+        'gradient-purple': '#9e67fa',
+        'gradient-pink': '#fe6abb',
+        'gradient-orange': '#ff9c65'
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { font-family: 'Inter', sans-serif; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #08020e;
+    color: #ece6ff;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  @media (max-width: 1024px) { body { cursor: auto; } }
+
+  .gradient-text {
+    background: linear-gradient(90deg, #9e67fa, #fe6abb 45%, #ff9c65);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .shadow-inner-glow {
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(255,255,255,0.02),
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 20px 40px -20px rgba(158, 103, 250, 0.15);
+  }
+  .bg-card { background: #0d0514; }
+  .bg-\[\#0f0915\] { background: #0f0915; }
+  .bg-\[\#0d0514\] { background: #0d0514; }
+  .section-divider {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+  }
+  .section-lines {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(158,103,250,0.12) 0px,
+      rgba(158,103,250,0.12) 1px,
+      transparent 1px,
+      transparent 80px
+    );
+  }
+  .template-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(158,103,250,0.4), rgba(254,106,187,0.2) 50%, transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .4s;
+  }
+  .template-card:hover::before { opacity: 1; }
+  .gradient-border-btn {
+    position: relative;
+    padding: 1px;
+    border-radius: 9999px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  }
+  .gradient-border-btn::before,
+  .gradient-border-btn::after {
+    content: '';
+    position: absolute;
+    left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.2) 10%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.2) 90%);
+  }
+  .gradient-border-btn::before { top: 0; }
+  .gradient-border-btn::after { bottom: 0; }
+  .primary-gradient-btn {
+    background: linear-gradient(90deg, rgb(158, 103, 250), rgb(254, 106, 187) 45%, rgb(255, 156, 101));
+    box-shadow: rgba(255,255,255,0.4) 0 -4px 8px inset, rgba(255,255,255,0.8) 0 0 4px inset;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .primary-gradient-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: rgba(255,255,255,0.5) 0 -4px 12px inset, rgba(255,255,255,0.9) 0 0 6px inset, 0 10px 30px -10px rgba(254,106,187,0.6);
+  }
+  .circle-bg {
+    background-image: radial-gradient(ellipse at center, rgba(158,103,250,0.2) 0%, transparent 60%);
+  }
+  .timeline-line {
+    background: linear-gradient(180deg, rgba(174,118,246,0.12), rgba(174,118,246,0.5) 13%, rgba(255,134,197,0.55) 87%, rgba(255,134,197,0.06) 101%);
+  }
+  .timeline-dot {
+    background: radial-gradient(circle at 16% 17%, #fff, #fe6abb 54%, #9e67fa);
+    box-shadow: 0 0 20px rgba(254,106,187,0.6);
+    animation: dotPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(254,106,187,0.6); transform: scale(1); }
+    50% { box-shadow: 0 0 30px rgba(254,106,187,0.9); transform: scale(1.1); }
+  }
+  .timeline-arm-top { background-image: linear-gradient(0deg, #fe6abb, rgba(255,255,255,0) 80%); }
+  .timeline-arm-bottom { background-image: linear-gradient(#fe6abb, rgba(255,255,255,0) 80%); }
+  .timeline-arm-right { background: linear-gradient(90deg, #9e67fa, #fe6abb 50%, #ff9c65, rgba(255,156,101,0)); }
+  .hover-lift { transition: transform .4s cubic-bezier(.2,.8,.2,1), border-color .3s ease, box-shadow .3s ease; }
+  .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 30px 60px -20px rgba(158,103,250,0.3); }
+  .nav-link { position: relative; }
+  .nav-link.active { color: #ece6ff; }
+  .nav-link:not(.active) { color: rgba(255,255,255,0.5); }
+  .nav-link:not(.active):hover { color: rgba(255,255,255,0.8); }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 50%; bottom: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, #9e67fa, #fe6abb);
+    transition: all .3s ease;
+    transform: translateX(-50%);
+  }
+  .nav-link.active::after, .nav-link:hover::after { width: 60%; }
+  .bento-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .bento-card:hover {
+    border-color: rgba(158,103,250,0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -20px rgba(158,103,250,0.25);
+  }
+  .overlay-gradient-1 { background: linear-gradient(90deg, #ff9c65, #fe6abb 26%, #9e67fa 83%, rgba(0,0,0,0)); }
+  .overlay-gradient-2 { background: linear-gradient(rgba(0,0,0,0), #9e67fa 17%, #fe6abb 74%, #ff9c65); }
+  .overlay-gradient-down { background: linear-gradient(#ff9c65, #fe6abb 26%, #9e67fa 83%, rgba(0,0,0,0)); }
+  select option { background: #0d0514; color: #ece6ff; }
+
+  /* Custom cursor */
+  .cursor-dot, .cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .15s ease;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), width .3s, height .3s, border-color .3s;
+  }
+  .cursor-ring.hover {
+    width: 60px; height: 60px;
+    border-color: #fe6abb;
+    background: rgba(254,106,187,0.1);
+  }
+
+  /* Particle canvas */
+  #particleCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* Hero gradient orb */
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: orbFloat 12s ease-in-out infinite;
+  }
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -40px) scale(1.1); }
+    66% { transform: translate(-20px, 30px) scale(0.95); }
+  }
+
+  /* Marquee */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    gap: 3rem;
+    mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 30s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  /* Reveal animations */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+
+  /* Text mask reveal */
+  .text-reveal { overflow: hidden; display: inline-block; }
+  .text-reveal > span {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .text-reveal.in-view > span { transform: translateY(0); }
+
+  /* Magnetic button */
+  .magnetic { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+
+  /* Glow on hover */
+  .glow-hover { position: relative; overflow: hidden; }
+  .glow-hover::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(254,106,187,0.25), transparent 60%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity .3s;
+    z-index: 1;
+  }
+  .glow-hover:hover::before { opacity: 1; }
+
+  /* Tilt card */
+  .tilt-card {
+    transform-style: preserve-3d;
+    transition: transform .2s ease-out;
+  }
+  .tilt-card .tilt-inner {
+    transform: translateZ(30px);
+    transition: transform .3s;
+  }
+
+  /* Loading screen */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: #08020e;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity .6s ease, visibility .6s;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    animation: loaderPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes loaderPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+  }
+
+  /* Counter */
+  .counter-num { font-variant-numeric: tabular-nums; }
+
+  /* Video fallback gradient */
+  .video-fallback {
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(158,103,250,0.35), transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(254,106,187,0.25), transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,156,101,0.15), transparent 60%);
+  }
+
+  /* Shimmer image placeholder */
+  .img-shimmer {
+    background: linear-gradient(90deg, #1a0b2e 0%, #2a1547 50%, #1a0b2e 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Floating shapes */
+  .float-shape {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.15;
+    animation: floatShape 20s ease-in-out infinite;
+  }
+  @keyframes floatShape {
+    0%, 100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(50px, -30px) rotate(90deg); }
+    50% { transform: translate(-30px, 50px) rotate(180deg); }
+    75% { transform: translate(40px, 20px) rotate(270deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-logo flex items-center gap-3">
+    <svg class="w-14 h-14" viewBox="0 0 40 40" fill="none">
+      <defs>
+        <linearGradient id="loaderGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#9e67fa"/>
+          <stop offset="50%" stop-color="#fe6abb"/>
+          <stop offset="100%" stop-color="#ff9c65"/>
+        </linearGradient>
+      </defs>
+      <path d="M20 4 L28 14 L36 20 L28 26 L20 36 L12 26 L4 20 L12 14 Z" fill="url(#loaderGrad)"/>
+      <circle cx="20" cy="20" r="4" fill="#08020e"/>
+    </svg>
+    <span class="text-2xl font-bold gradient-text">Design Rocket</span>
+  </div>
+</div>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- NAVIGATION -->
+<nav class="fixed top-0 left-0 right-0 w-full py-5 px-8 flex items-center justify-between z-50 backdrop-blur-md bg-background/60 border-b border-white/5">
+  <a href="#" class="flex items-center magnetic" data-magnetic>
+    <div class="flex items-center gap-2">
+      <svg class="w-8 h-8" viewBox="0 0 40 40" fill="none">
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#9e67fa"/>
+            <stop offset="50%" stop-color="#fe6abb"/>
+            <stop offset="100%" stop-color="#ff9c65"/>
+          </linearGradient>
+        </defs>
+        <path d="M20 4 L28 14 L36 20 L28 26 L20 36 L12 26 L4 20 L12 14 Z" fill="url(#logoGrad)"/>
+        <circle cx="20" cy="20" r="4" fill="#08020e"/>
+      </svg>
+      <span class="text-lg font-bold text-violet-100">Design Rocket</span>
+    </div>
+  </a>
+  <div class="hidden lg:flex items-center gap-2 px-2 border-2 border-white/5 rounded-lg shadow-inner-glow bg-white/[0.02]">
+    <a href="#hero" class="nav-link active px-4 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+    <a href="#features" class="nav-link px-4 py-2 rounded-md text-sm font-medium transition-colors">Feature</a>
+    <a href="#templates" class="nav-link px-4 py-2 rounded-md text-sm font-medium transition-colors">Templates</a>
+    <a href="#pricing" class="nav-link px-4 py-2 rounded-md text-sm font-medium transition-colors">Pricing</a>
+    <a href="#contact" class="nav-link px-4 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+  </div>
+  <div class="hidden lg:flex items-center gap-4">
+    <a href="#" class="text-white/50 hover:text-white/80 transition-colors px-4 py-2 text-sm">Login</a>
+    <button class="magnetic border-2 border-white/20 rounded-full bg-transparent hover:bg-white/5 transition-colors px-8 py-3" data-magnetic>
+      <span class="gradient-text font-medium text-sm">Get Started</span>
+    </button>
+  </div>
+  <button class="lg:hidden text-violet-100 p-2" id="mobileMenuBtn">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="hidden fixed inset-0 z-[60] bg-background/95 backdrop-blur-xl pt-24 px-8 lg:hidden">
+  <div class="flex flex-col gap-4">
+    <a href="#hero" class="text-violet-100 text-2xl font-medium py-2 border-b border-white/5">Home</a>
+    <a href="#features" class="text-white/50 text-2xl font-medium py-2 border-b border-white/5">Feature</a>
+    <a href="#templates" class="text-white/50 text-2xl font-medium py-2 border-b border-white/5">Templates</a>
+    <a href="#pricing" class="text-white/50 text-2xl font-medium py-2 border-b border-white/5">Pricing</a>
+    <a href="#contact" class="text-white/50 text-2xl font-medium py-2 border-b border-white/5">Contact</a>
+    <button class="mt-6 border-2 border-white/20 rounded-full py-3 gradient-text font-medium">Get Started</button>
+  </div>
+</div>
+
+<!-- HERO SECTION -->
+<section id="hero" class="relative flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 text-center overflow-hidden">
+  <!-- Video background -->
+  <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-30 z-[1]">
+    <source src="https://cdn.pixabay.com/video/2023/10/13/184846-874896400_large.mp4" type="video/mp4">
+  </video>
+  <!-- Animated orbs -->
+  <div class="hero-orb w-[500px] h-[500px] bg-gradient-purple" style="top: 10%; left: 10%;"></div>
+  <div class="hero-orb w-[400px] h-[400px] bg-gradient-pink" style="top: 40%; right: 10%; animation-delay: -4s;"></div>
+  <div class="hero-orb w-[350px] h-[350px] bg-gradient-orange" style="bottom: 10%; left: 40%; animation-delay: -8s;"></div>
+  <!-- Floating shapes -->
+  <svg class="float-shape w-20 h-20" style="top: 20%; left: 15%;" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#9e67fa" stroke-width="2"/></svg>
+  <svg class="float-shape w-16 h-16" style="top: 60%; right: 20%; animation-delay: -5s;" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" fill="none" stroke="#fe6abb" stroke-width="2"/></svg>
+  <svg class="float-shape w-24 h-24" style="bottom: 20%; left: 25%; animation-delay: -10s;" viewBox="0 0 100 100"><polygon points="50,10 90,90 10,90" fill="none" stroke="#ff9c65" stroke-width="2"/></svg>
+
+  <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#08020e] to-transparent z-[2]"></div>
+  <div class="absolute left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] z-[3] circle-bg" style="top: 30%;"></div>
+
+  <div class="relative z-10 flex flex-col items-center px-4 pt-48 sm:pt-56">
+    <div class="mb-8 md:mb-12" id="heroBadge">
+      <div class="inline-flex items-center gap-2 py-1 pl-1 pr-2 border-2 border-white/20 rounded-full shadow-inner-glow bg-white/[0.02]">
+        <div class="bg-gradient-to-r from-gradient-purple via-gradient-pink to-gradient-orange text-white text-sm font-medium px-2 py-0.5 rounded-full">New</div>
+        <div class="flex items-center gap-1">
+          <p class="text-violet-100 text-sm">SPRING SPECIAL — <span id="countdown" class="font-mono">10:51:04</span></p>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet-100"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+    <div id="heroTitle">
+      <h1 class="text-violet-100 font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[5rem] leading-tight">
+        <span class="text-reveal"><span>Powerful templates to ship</span></span>
+      </h1>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[5rem] leading-tight mt-1">
+        <span class="text-reveal"><span class="gradient-text font-semibold">better websites faster.</span></span>
+      </h2>
+    </div>
+    <div class="mt-6" id="heroSub">
+      <p class="max-w-2xl mb-8 text-base sm:text-lg px-4 text-muted-foreground">Go from idea to a live website in just a few prompts.</p>
+    </div>
+    <div id="heroCta">
+      <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <a href="#" class="gradient-border-btn inline-block magnetic" data-magnetic>
+          <div class="text-white flex items-center justify-center py-3 px-8 rounded-full primary-gradient-btn">
+            <span class="font-medium text-base inline-flex items-center gap-2">Get All Access!</span>
+          </div>
+        </a>
+        <a href="#templates">
+          <button class="magnetic border-2 border-white/20 rounded-full bg-card hover:bg-card/80 transition-colors p-1" data-magnetic>
+            <div class="py-3 px-8 rounded-full">
+              <span class="gradient-text font-medium text-base">Explore Templates</span>
+            </div>
+          </button>
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats counters -->
+    <div class="mt-20 grid grid-cols-3 gap-8 md:gap-16" id="heroStats">
+      <div class="text-center">
+        <div class="text-3xl md:text-5xl font-bold gradient-text counter-num" data-count="2400">0</div>
+        <div class="text-xs md:text-sm text-muted-foreground mt-2">Templates</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl md:text-5xl font-bold gradient-text counter-num" data-count="180">0</div>
+        <div class="text-xs md:text-sm text-muted-foreground mt-2">K+ Users</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl md:text-5xl font-bold gradient-text counter-num" data-count="98">0</div>
+        <div class="text-xs md:text-sm text-muted-foreground mt-2">% Satisfaction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<section class="py-12 border-y border-white/5 bg-background relative z-10">
+  <div class="marquee">
+    <div class="marquee-track">
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ AI Templates</span>
+      <span class="text-2xl md:text-3xl font-bold gradient-text whitespace-nowrap">✦ Landing Pages</span>
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ SaaS Kits</span>
+      <span class="text-2xl md:text-3xl font-bold gradient-text whitespace-nowrap">✦ Dashboards</span>
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ Mobile Apps</span>
+      <span class="text-2xl md:text-3xl font-bold gradient-text whitespace-nowrap">✦ E-commerce</span>
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ Portfolios</span>
+    </div>
+    <div class="marquee-track" aria-hidden="true">
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ AI Templates</span>
+      <span class="text-2xl md:text-3xl font-bold gradient-text whitespace-nowrap">✦ Landing Pages</span>
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ SaaS Kits</span>
+      <span class="text-2xl md:text-3xl font-bold gradient-text whitespace-nowrap">✦ Dashboards</span>
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ Mobile Apps</span>
+      <span class="text-2xl md:text-3xl font-bold gradient-text whitespace-nowrap">✦ E-commerce</span>
+      <span class="text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap">✦ Portfolios</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED TEMPLATES -->
+<section id="templates" class="py-20 md:py-28 px-4 md:px-8 relative">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col items-center text-center mb-12">
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 py-2 px-4 border-2 border-white/20 rounded-full shadow-inner-glow bg-white/[0.02]">
+          <span class="gradient-text font-medium text-sm">Design rocket templates</span>
+        </div>
+      </div>
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-violet-100 mt-6 reveal reveal-delay-1">
+        <span class="text-reveal"><span>Featured templates</span></span>
+      </h2>
+    </div>
+    <div id="templateGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <div class="flex justify-center mt-12 reveal">
+      <a href="#">
+        <button class="magnetic py-3 px-6 rounded-full border-2 border-white/20 bg-card hover:bg-card/80 transition-colors" data-magnetic>
+          <span class="gradient-text font-medium">Get All Access</span>
+        </button>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ACADEMY SECTION -->
+<section id="academy" class="py-16 px-8 bg-background relative">
+  <div class="absolute top-0 left-0 right-0 h-[1px] z-10 section-divider"></div>
+  <div class="absolute top-0 left-0 right-0 h-48 z-0 section-lines opacity-40"></div>
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="flex flex-col items-center justify-start text-center gap-6 mb-12">
+      <div class="reveal inline-flex items-center py-2 px-4 border border-white/20 rounded-full shadow-inner-glow bg-background">
+        <div class="text-sm font-medium gradient-text">Academy</div>
+      </div>
+      <h2 class="text-violet-100 text-4xl sm:text-5xl lg:text-6xl font-semibold max-w-4xl reveal reveal-delay-1">
+        <span class="text-reveal"><span>Need More Help?</span></span><br>
+        <span class="text-reveal"><span class="gradient-text">Explore Design Rocket course.</span></span>
+      </h2>
+      <a href="#" class="gradient-border-btn inline-block magnetic reveal reveal-delay-2" data-magnetic>
+        <div class="text-white flex items-center justify-center py-3 px-8 rounded-full primary-gradient-btn">
+          <span class="font-medium text-base">Get instant access</span>
+        </div>
+      </a>
+    </div>
+    <div class="relative rounded-2xl shadow-inner-glow border border-white/20 overflow-hidden reveal tilt-card" data-tilt>
+      <img id="academyImg" class="object-cover w-full h-auto img-shimmer" alt="Dashboard preview" src="https://picsum.photos/seed/academy/1600/900"/>
+      <div class="absolute inset-0 overlay-gradient-down opacity-40 rounded-2xl pointer-events-none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section id="features" class="py-16 px-8 bg-background">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
+      <div class="flex items-start gap-4 reveal">
+        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="url(#fGrad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs><linearGradient id="fGrad1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9e67fa"/><stop offset="100%" stop-color="#fe6abb"/></linearGradient></defs>
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+        </svg>
+        <div class="flex flex-col gap-2">
+          <h3 class="text-violet-100 text-xl font-semibold">Learn what you need</h3>
+          <p class="text-muted-foreground">Code like a designer — build your website in 1 day to get real-world feedback and keep learning as you go.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 reveal reveal-delay-1">
+        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="url(#fGrad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs><linearGradient id="fGrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9e67fa"/><stop offset="100%" stop-color="#ff9c65"/></linearGradient></defs>
+          <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>
+        </svg>
+        <div class="flex flex-col gap-2">
+          <h3 class="text-violet-100 text-xl font-semibold">Design beautiful Websites with AI</h3>
+          <p class="text-muted-foreground">Get ahead of the game by mastering AI design plus get Access to the Full AI Web Design System</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 reveal reveal-delay-2">
+        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="url(#fGrad3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs><linearGradient id="fGrad3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fe6abb"/><stop offset="100%" stop-color="#ff9c65"/></linearGradient></defs>
+          <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/>
+        </svg>
+        <div class="flex flex-col gap-2">
+          <h3 class="text-violet-100 text-xl font-semibold">Motion Backgrounds</h3>
+          <p class="text-muted-foreground">Grab stunning animated backgrounds. Instant visual impact that stops scrolling. One click to download.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US SECTION -->
+<section class="py-16 px-8 bg-background relative">
+  <div class="absolute top-0 left-0 right-0 h-[1px] z-10 section-divider"></div>
+  <div class="absolute top-0 left-0 right-0 h-48 z-0 section-lines opacity-40"></div>
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+      <div class="flex flex-col gap-6 lg:sticky lg:top-24">
+        <div class="self-start reveal">
+          <div class="inline-flex items-center py-2 px-4 border border-white/20 rounded-full shadow-inner-glow bg-background">
+            <div class="text-sm font-medium gradient-text">Why us</div>
+          </div>
+        </div>
+        <h2 class="text-violet-100 text-4xl sm:text-5xl lg:text-6xl font-semibold reveal reveal-delay-1">
+          <span class="text-reveal"><span>From idea to live site</span></span><br>
+          <span class="text-reveal"><span class="gradient-text">in 1-2 Prompts</span></span>
+        </h2>
+      </div>
+      <div class="pl-3 relative">
+        <div class="absolute left-0 top-0 bottom-0 w-[1px] timeline-line"></div>
+        <div class="flex flex-col gap-16">
+          <div class="flex-col pl-16 relative flex gap-4 reveal">
+            <p class="text-muted-foreground opacity-50 text-sm">Step 1</p>
+            <h3 class="text-violet-100 text-3xl font-semibold">Choose a template</h3>
+            <p class="text-muted-foreground">Browse premium templates and discover the perfect design for your site.</p>
+            <div class="absolute left-[-19px] top-[54px] w-4 h-4">
+              <div class="w-full h-full rounded-full timeline-dot"></div>
+              <div class="absolute left-[7px] bottom-full timeline-arm-top" style="width:2px;height:40px;"></div>
+              <div class="absolute left-[7px] top-full timeline-arm-bottom" style="width:2px;height:40px;"></div>
+              <div class="absolute left-4 top-[6px] w-12 h-[2px] timeline-arm-right"></div>
+            </div>
+          </div>
+          <div class="flex-col pl-16 relative flex gap-4 reveal reveal-delay-1">
+            <p class="text-muted-foreground opacity-50 text-sm">Step 2</p>
+            <h3 class="text-violet-100 text-3xl font-semibold">Ask AI to Customize it</h3>
+            <p class="text-muted-foreground">Easy to customize content, colors, and images effortlessly to reflect your brand.</p>
+            <div class="absolute left-[-19px] top-[54px] w-4 h-4">
+              <div class="w-full h-full rounded-full timeline-dot" style="animation-delay:-.8s"></div>
+              <div class="absolute left-[7px] bottom-full timeline-arm-top" style="width:2px;height:40px;"></div>
+              <div class="absolute left-[7px] top-full timeline-arm-bottom" style="width:2px;height:40px;"></div>
+              <div class="absolute left-4 top-[6px] w-12 h-[2px] timeline-arm-right"></div>
+            </div>
+          </div>
+          <div class="flex-col pl-16 relative flex gap-4 reveal reveal-delay-2">
+            <p class="text-muted-foreground opacity-50 text-sm">Step 3</p>
+            <h3 class="text-violet-100 text-3xl font-semibold flex items-center gap-2">
+              Publish in minutes
+              <svg class="w-6 h-6 inline-block" viewBox="0 0 24 24" fill="url(#heartGrad)">
+                <defs><linearGradient id="heartGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9e67fa"/><stop offset="100%" stop-color="#fe6abb"/></linearGradient></defs>
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </h3>
+            <p class="text-muted-foreground">Launch your site in one click—zero coding required.</p>
+            <div class="absolute left-[-19px] top-[54px] w-4 h-4">
+              <div class="w-full h-full rounded-full timeline-dot" style="animation-delay:-1.6s"></div>
+              <div class="absolute left-[7px] bottom-full timeline-arm-top" style="width:2px;height:40px;"></div>
+              <div class="absolute left-[7px] top-full timeline-arm-bottom" style="width:2px;height:40px;"></div>
+              <div class="absolute left-4 top-[6px] w-12 h-[2px] timeline-arm-right"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENTO FEATURES -->
+<section class="py-16 px-8 bg-background relative">
+  <div class="absolute top-0 left-0 right-0 h-[1px] z-10 section-divider"></div>
+  <div class="absolute top-0 left-0 right-0 h-48 z-0 section-lines opacity-40"></div>
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="flex flex-col items-center text-center mb-12">
+      <div class="items-center bg-gradient-to-r from-gradient-purple via-gradient-pink to-gradient-orange justify-center flex rounded-xl p-4 shadow-inner-glow reveal">
+        <svg class="w-12 h-12" viewBox="0 0 34 48" fill="#ece6ff">
+          <path fill-rule="evenodd" d="m26.4 36.8c1 0 1.9 0.8 1.9 1.8 0 1.1-0.9 1.9-1.9 1.9h-1.9v1.9c0 3.1-2.5 5.6-5.6 5.6h-3.8c-3.1 0-5.6-2.5-5.6-5.6v-1.9h-1.9c-1 0-1.8-0.8-1.8-1.9 0-1 0.8-1.8 1.8-1.8h1.9v-1.4c0-2-0.8-3.7-2.2-4.7-5-3.6-8-9.7-7-16.5 1.2-7.3 7.3-13.2 14.7-14.1 10.2-1.2 18.9 6.8 18.9 16.8 0 5.6-2.8 10.7-7.1 13.7-1.5 1.1-2.3 2.9-2.3 4.9v1.3zm3.8-19.9c0-7.8-6.8-14-14.8-13.1-5.7 0.7-10.5 5.3-11.3 11-0.9 5.3 1.5 10.1 5.4 12.8 2.5 1.8 3.8 4.9 3.8 7.8v1.4h7.5v-1.3c0-2.9 1.2-6.1 3.8-7.9 3.4-2.4 5.6-6.3 5.6-10.7zm-9.4 23.6h-7.5v1.9c0 1 0.8 1.9 1.9 1.9h3.7c1 0 1.9-0.9 1.9-1.9zm-2.9-32.8c0.9 0.4 1.3 1.6 0.8 2.5l-2.4 4.8h4.5c0.6 0 1.2 0.3 1.6 0.9 0.3 0.5 0.3 1.2 0.1 1.8l-3.8 7.5c-0.5 0.9-1.6 1.3-2.5 0.8-0.9-0.4-1.3-1.6-0.9-2.5l2.4-4.8h-4.4c-0.7 0-1.3-0.3-1.6-0.9-0.4-0.5-0.4-1.2-0.1-1.8l3.7-7.5c0.5-0.9 1.6-1.3 2.6-0.8zm-2.9-7.6l0.2 1.9z"/>
+        </svg>
+      </div>
+      <h2 class="text-violet-100 text-4xl sm:text-5xl lg:text-6xl font-semibold max-w-4xl mt-6 reveal reveal-delay-1">
+        <span class="text-reveal"><span>Build like never before.</span></span>
+      </h2>
+    </div>
+
+    <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 auto-rows-fr mb-8">
+      <div class="relative h-full overflow-hidden lg:col-span-2 reveal">
+        <div class="bento-card rounded-xl h-full p-10 flex flex-col justify-between">
+          <div>
+            <h3 class="text-violet-100 text-2xl font-bold mb-2">Top-tier design with a small investment</h3>
+            <p class="text-muted-foreground">Designing a website is hard. Hiring shouldn't break the bank. We've got you covered.</p>
+          </div>
+          <div class="flex justify-center items-center flex-1 mt-6">
+            <img id="bento1" class="w-full h-auto rounded-lg" alt="" src="https://picsum.photos/seed/bento1/1200/700"/>
+          </div>
+        </div>
+      </div>
+      <div class="relative h-full overflow-hidden reveal reveal-delay-1">
+        <div class="bento-card rounded-xl h-full p-10 flex flex-col justify-between">
+          <div class="flex-1 flex justify-center items-center">
+            <img id="bento2" class="w-[90%] h-auto rounded-lg" alt="" src="https://picsum.photos/seed/bento2/800/700"/>
+          </div>
+          <div class="mt-6">
+            <h3 class="text-violet-100 text-2xl font-bold mb-2">Blazing fast loading</h3>
+            <p class="text-muted-foreground">Optimized structure for lightning-fast performance across devices.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 auto-rows-fr">
+      <div class="relative h-full overflow-hidden reveal">
+        <div class="bento-card rounded-xl h-full p-10 flex flex-col justify-between">
+          <div class="flex-1 flex justify-center items-center">
+            <img id="bento3" class="w-[90%] h-auto rounded-lg" alt="" src="https://picsum.photos/seed/bento3/800/700"/>
+          </div>
+          <div class="mt-6">
+            <h3 class="text-violet-100 text-2xl font-bold mb-2">Course on designing with AI</h3>
+            <p class="text-muted-foreground">Don't skip design. Learn design and AI, by building real websites.</p>
+          </div>
+        </div>
+      </div>
+      <div class="relative h-full overflow-hidden lg:col-span-2 reveal reveal-delay-1">
+        <div class="bento-card rounded-xl h-full flex flex-col">
+          <div class="flex-1">
+            <img id="bento4" class="w-full h-full object-cover rounded-t-xl" alt="" src="https://picsum.photos/seed/bento4/1200/700"/>
+          </div>
+          <div class="p-10">
+            <h3 class="text-violet-100 text-2xl font-bold mb-2">Built Exclusively for Modern Builders</h3>
+            <p class="text-muted-foreground">The best and the easiest Full Stack builder experience out there.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED COURSES -->
+<section id="pricing" class="py-16 px-8 bg-background relative">
+  <div class="absolute top-0 left-0 right-0 h-[1px] z-10 section-divider"></div>
+  <div class="absolute top-0 left-0 right-0 h-48 z-0 section-lines opacity-40"></div>
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="flex flex-col items-center text-center mb-12">
+      <div class="inline-flex items-center py-2 px-4 border border-white/20 rounded-full shadow-inner-glow bg-background reveal">
+        <div class="text-sm font-medium gradient-text">Ready to start?</div>
+      </div>
+      <h2 class="text-violet-100 text-4xl sm:text-5xl lg:text-6xl font-semibold mt-6 mb-4 reveal reveal-delay-1">
+        <span class="text-reveal"><span>Featured Courses</span></span>
+      </h2>
+      <p class="text-muted-foreground text-lg max-w-2xl mx-auto reveal reveal-delay-2">Get access to all our premium courses, tutorials, downloads & templates</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div class="group relative h-full flex flex-col rounded-2xl bg-[#0d0514] border border-white/10 overflow-hidden hover-lift hover:border-gradient-purple/40 transition-all duration-300 reveal tilt-card" data-tilt>
+        <div class="relative overflow-hidden aspect-[16/10]">
+          <img id="course1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" src="https://picsum.photos/seed/course1/800/500"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0d0514] via-transparent to-transparent"></div>
+        </div>
+        <div class="p-6 space-y-4 text-center flex-1 flex flex-col justify-between">
+          <div class="space-y-4">
+            <h3 class="text-xl sm:text-2xl font-bold text-violet-100 leading-tight">Full course for Landing page design with AI</h3>
+            <p class="text-muted-foreground text-sm sm:text-base leading-relaxed">Learn how to Build Beautiful websites with AI plus get Access to the Full AI Web Design System</p>
+          </div>
+          <div class="flex justify-center pt-4">
+            <button class="magnetic border-2 border-white/20 rounded-full bg-card hover:bg-card/80 transition-colors px-8 py-3" data-magnetic>
+              <span class="gradient-text font-medium text-base">Learn More</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="group relative h-full flex flex-col rounded-2xl bg-[#0d0514] border border-white/10 overflow-hidden hover-lift hover:border-gradient-purple/40 transition-all duration-300 reveal reveal-delay-1 tilt-card" data-tilt>
+        <div class="relative overflow-hidden aspect-[16/10]">
+          <video autoplay muted loop playsinline class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" poster="https://picsum.photos/seed/course2/800/500">
+            <source src="https://cdn.pixabay.com/video/2022/12/04/141821-778415418_large.mp4" type="video/mp4">
+          </video>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0d0514] via-transparent to-transparent"></div>
+        </div>
+        <div class="p-6 space-y-4 text-center flex-1 flex flex-col justify-between">
+          <div class="space-y-4">
+            <h3 class="text-xl sm:text-2xl font-bold text-violet-100 leading-tight">Powerful templates to ship better websites faster.</h3>
+            <p class="text-muted-foreground text-sm sm:text-base leading-relaxed">Go from idea to a live website in just a few prompts.</p>
+          </div>
+          <div class="flex justify-center pt-4">
+            <a href="#" class="gradient-border-btn inline-block magnetic" data-magnetic>
+              <div class="text-white flex items-center justify-center py-3 px-8 rounded-full primary-gradient-btn">
+                <span class="font-medium text-base">Get Started</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="group relative h-full flex flex-col rounded-2xl bg-[#0d0514] border border-white/10 overflow-hidden hover-lift hover:border-gradient-purple/40 transition-all duration-300 reveal reveal-delay-2 tilt-card" data-tilt>
+        <div class="relative overflow-hidden aspect-[16/10]">
+          <img id="course3" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" src="https://picsum.photos/seed/course3/800/500"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0d0514] via-transparent to-transparent"></div>
+        </div>
+        <div class="p-6 space-y-4 text-center flex-1 flex flex-col justify-between">
+          <div class="space-y-4">
+            <h3 class="text-xl sm:text-2xl font-bold text-violet-100 leading-tight">Full Process on How to Sell AI Websites</h3>
+            <p class="text-muted-foreground text-sm sm:text-base leading-relaxed">Get clients. Set your prices. Scale your business. The complete playbook to sell AI websites.</p>
+          </div>
+          <div class="flex justify-center pt-4">
+            <button class="magnetic border-2 border-white/20 rounded-full bg-card hover:bg-card/80 transition-colors px-8 py-3" data-magnetic>
+              <span class="gradient-text font-medium text-base">Learn More</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="relative w-full py-24 md:py-32 overflow-hidden">
+  <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover z-0">
+    <source src="https://cdn.pixabay.com/video/2020/07/30/45753-445765790_large.mp4" type="video/mp4">
+  </video>
+  <div class="absolute inset-0 bg-black/60 z-[1]"></div>
+  <div class="absolute left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] z-[2] circle-bg" style="top: 10%;"></div>
+  <div class="relative z-10 max-w-4xl mx-auto px-8 text-center flex flex-col items-center gap-8">
+    <div class="flex items-center gap-2 reveal">
+      <svg class="w-10 h-10" viewBox="0 0 40 40" fill="none">
+        <path d="M20 4 L28 14 L36 20 L28 26 L20 36 L12 26 L4 20 L12 14 Z" fill="url(#logoGrad)"/>
+        <circle cx="20" cy="20" r="4" fill="#08020e"/>
+      </svg>
+      <span class="text-xl font-bold text-violet-100">Design Rocket</span>
+    </div>
+    <h2 class="text-violet-100 text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight reveal reveal-delay-1">
+      <span class="text-reveal"><span>Learn to design with AI</span></span><br>
+      <span class="text-reveal"><span class="gradient-text">in weeks, not Months</span></span>
+    </h2>
+    <a href="#" class="gradient-border-btn inline-block magnetic reveal reveal-delay-2" data-magnetic>
+      <div class="text-white flex items-center justify-center py-3 px-8 rounded-full primary-gradient-btn">
+        <span class="font-medium text-base">Get Started for Free</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact" class="px-8 py-24 bg-background relative">
+  <div class="absolute top-0 left-0 right-0 h-[1px] section-divider"></div>
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col lg:flex-row items-start justify-between gap-20">
+      <div class="flex flex-col gap-6 max-w-sm">
+        <a href="#" class="inline-block">
+          <div class="flex items-center gap-2">
+            <svg class="w-10 h-10" viewBox="0 0 40 40" fill="none">
+              <path d="M20 4 L28 14 L36 20 L28 26 L20 36 L12 26 L4 20 L12 14 Z" fill="url(#logoGrad)"/>
+              <circle cx="20" cy="20" r="4" fill="#08020e"/>
+            </svg>
+            <span class="text-xl font-bold text-violet-100">Design Rocket</span>
+          </div>
+        </a>
+        <p class="text-muted-foreground">Build stunning websites with premium templates and courses</p>
+        <div class="flex gap-6">
+          <a href="#" aria-label="Instagram" class="hover:scale-110 transition-transform"><svg class="w-6 h-6" fill="rgb(150,156,177)" viewBox="0 0 26 24"><path clip-rule="evenodd" d="M17.3194 2H8.43056C5.36231 2 2.875 4.48731 2.875 7.55556V16.4444C2.875 19.5127 5.36231 22 8.43056 22H17.3194C20.3876 22 22.875 19.5127 22.875 16.4444V7.55556C22.875 4.48731 20.3876 2 17.3194 2ZM20.9305 16.4444C20.9244 18.4362 19.3112 20.0494 17.3194 20.0556H8.43056C6.43873 20.0494 4.82555 18.4362 4.81945 16.4444V7.55556C4.82555 5.56372 6.43873 3.95054 8.43056 3.94444H17.3194C19.3112 3.95054 20.9244 5.56372 20.9305 7.55556V16.4444ZM18.1527 7.83333C18.7664 7.83333 19.2638 7.33587 19.2638 6.72222C19.2638 6.10858 18.7664 5.61111 18.1527 5.61111C17.5391 5.61111 17.0416 6.10858 17.0416 6.72222C17.0416 7.33587 17.5391 7.83333 18.1527 7.83333ZM12.875 7C10.1136 7 7.875 9.23858 7.875 12C7.875 14.7614 10.1136 17 12.875 17C15.6364 17 17.875 14.7614 17.875 12C17.878 10.673 17.3521 9.39952 16.4137 8.4612C15.4754 7.52288 14.202 6.99704 12.875 7ZM9.81945 12C9.81945 13.6876 11.1874 15.0556 12.875 15.0556C14.5625 15.0556 15.9305 13.6876 15.9305 12C15.9305 10.3124 14.5625 8.94444 12.875 8.94444C11.1874 8.94444 9.81945 10.3124 9.81945 12Z" fill-rule="evenodd"/></svg></a>
+          <a href="#" aria-label="Facebook" class="hover:scale-110 transition-transform"><svg class="w-4 h-6" fill="rgb(150,156,177)" viewBox="0 0 15 24"><path d="M11.7556 5.33333H8.42217C7.8085 5.33333 7.31106 5.8308 7.31106 6.44444V9.77778H11.7556C11.8819 9.77498 12.0018 9.83378 12.0769 9.93544C12.152 10.0371 12.1731 10.1689 12.1333 10.2889L11.3111 12.7333C11.2353 12.9577 11.0256 13.1093 10.7888 13.1111H7.31106V21.4444C7.31106 21.7512 7.06228 22 6.7555 22H3.97773C3.67091 22 3.42217 21.7512 3.42217 21.4444V13.1111H1.75551C1.44868 13.1111 1.19995 12.8623 1.19995 12.5556V10.3333C1.19995 10.0266 1.44868 9.77778 1.75551 9.77778H3.42217V6.44444C3.42217 3.98984 5.41206 2 7.86662 2H11.7556C12.0623 2 12.3111 2.24873 12.3111 2.55556V4.77778C12.3111 5.0846 12.0623 5.33333 11.7556 5.33333Z"/></svg></a>
+          <a href="#" aria-label="Twitter" class="hover:scale-110 transition-transform"><svg class="w-6 h-6" fill="rgb(150,156,177)" viewBox="0 0 31 24"><path d="M26.8412 4.89857C26.2342 5.7084 25.5003 6.41482 24.668 6.99055C24.668 7.20209 24.668 7.41363 24.668 7.63694C24.6747 11.4786 23.1402 15.1622 20.4085 17.8621C17.6767 20.562 13.9764 22.0522 10.1369 21.9986C7.91724 22.0061 5.72597 21.4993 3.73479 20.5178C3.62742 20.4709 3.55817 20.3647 3.55858 20.2475V20.1182C3.55858 19.9494 3.69533 19.8127 3.86401 19.8127C6.04591 19.7407 8.14996 18.9842 9.87849 17.6502C7.90357 17.6104 6.12665 16.4404 5.30889 14.6415C5.26759 14.5433 5.28044 14.4305 5.34283 14.3441C5.40521 14.2577 5.5081 14.2101 5.61431 14.2185C6.21453 14.2787 6.82076 14.2229 7.39987 14.0539C5.21972 13.6013 3.58157 11.7914 3.34713 9.5761C3.3388 9.46982 3.38642 9.36694 3.4728 9.30446C3.55917 9.24211 3.67181 9.22917 3.77003 9.2706C4.35508 9.52877 4.98665 9.66472 5.62606 9.67008C3.71573 8.4163 2.89059 6.03145 3.61731 3.86435C3.69233 3.65377 3.87256 3.4982 4.09176 3.45483C4.31095 3.41144 4.53681 3.48665 4.6863 3.6528C7.26417 6.39642 10.8062 8.03133 14.5655 8.21281C14.4693 7.82858 14.422 7.43369 14.4246 7.03755C14.4598 4.96043 15.745 3.11008 17.6786 2.35277C19.612 1.59548 21.8113 2.08109 23.2467 3.58228C24.225 3.39589 25.1709 3.06726 26.0542 2.60681C26.1189 2.56642 26.2009 2.56642 26.2657 2.60681C26.306 2.67155 26.306 2.75362 26.2657 2.81836C25.8378 3.79807 25.1151 4.61977 24.1982 5.16888C25.0011 5.07577 25.7898 4.88637 26.5476 4.60477C26.6114 4.56134 26.6952 4.56134 26.759 4.60477C26.8125 4.62921 26.8525 4.67597 26.8683 4.73258C26.8841 4.7892 26.8742 4.84992 26.8412 4.89857Z"/></svg></a>
+          <a href="#" aria-label="LinkedIn" class="hover:scale-110 transition-transform"><svg class="w-6 h-6" fill="rgb(150,156,177)" viewBox="0 0 25 24"><path clip-rule="evenodd" d="M4.82232 2H20.3779C21.6052 2 22.6001 2.99492 22.6001 4.22222V19.7778C22.6001 21.0051 21.6052 22 20.3779 22H4.82232C3.59502 22 2.6001 21.0051 2.6001 19.7778V4.22222C2.6001 2.99492 3.59502 2 4.82232 2ZM8.15566 18.6667C8.46248 18.6667 8.71121 18.4179 8.71121 18.1111V10.3333C8.71121 10.0266 8.46248 9.77778 8.15566 9.77778H6.48899C6.18217 9.77778 5.93343 10.0266 5.93343 10.3333V18.1111C5.93343 18.4179 6.18217 18.6667 6.48899 18.6667H8.15566ZM7.32232 8.66667C6.40184 8.66667 5.65566 7.92048 5.65566 7C5.65566 6.07952 6.40184 5.33333 7.32232 5.33333C8.2428 5.33333 8.98899 6.07952 8.98899 7C8.98899 7.92048 8.2428 8.66667 7.32232 8.66667ZM18.7112 18.6667C19.018 18.6667 19.2668 18.4179 19.2668 18.1111V13C19.3029 11.2342 17.9974 9.72724 16.2445 9.51111C15.019 9.39917 13.8315 9.97156 13.1557 11V10.3333C13.1557 10.0266 12.9069 9.77778 12.6001 9.77778H10.9334C10.6267 9.77778 10.3779 10.0266 10.3779 10.3333V18.1111C10.3779 18.4179 10.6267 18.6667 10.9334 18.6667H12.6001C12.9069 18.6667 13.1557 18.4179 13.1557 18.1111V13.9444C13.1557 13.024 13.9019 12.2778 14.8223 12.2778C15.7428 12.2778 16.489 13.024 16.489 13.9444V18.1111C16.489 18.4179 16.7378 18.6667 17.0445 18.6667H18.7112Z" fill-rule="evenodd"/></svg></a>
+        </div>
+        <a href="#" class="gradient-border-btn inline-block magnetic" data-magnetic>
+          <div class="text-white flex items-center justify-center py-3 px-8 rounded-full primary-gradient-btn">
+            <span class="font-medium text-base">Buy Template</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20 flex-1">
+        <div>
+          <h3 class="text-violet-100 text-lg font-semibold mb-4">Pages</h3>
+          <div class="flex flex-col gap-3">
+            <a href="#hero" class="text-muted-foreground hover:text-violet-100 transition-colors">Home</a>
+            <a href="#templates" class="text-muted-foreground hover:text-violet-100 transition-colors">Templates</a>
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Premium Templates</a>
+            <a href="#academy" class="text-muted-foreground hover:text-violet-100 transition-colors">Training</a>
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Login</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-violet-100 text-lg font-semibold mb-4">Resources</h3>
+          <div class="flex flex-col gap-3">
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Dashboard</a>
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Video Backgrounds</a>
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Coaching</a>
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Sell AI Websites</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-violet-100 text-lg font-semibold mb-4">Legal</h3>
+          <div class="flex flex-col gap-3">
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Privacy Policy</a>
+            <a href="#" class="text-muted-foreground hover:text-violet-100 transition-colors">Terms of Service</a>
+          </div>
+          <p class="text-muted-foreground text-sm mt-6">© 2026 Design Rocket.<br>All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============ TEMPLATES ============ */
+const templates = [
+  { title: "Sync", desc: "AI startup/Agency Template", overlay: 1, seed: "sync" },
+  { title: "Radiant", desc: "Stunning SaaS Template", overlay: 2, seed: "radiant" },
+  { title: "AI Datalog", desc: "AI SaaS Template", overlay: 2, seed: "datalog" },
+  { title: "Start AI", desc: "AI Design Agency Template", overlay: 1, seed: "startai" },
+  { title: "Automation Ally", desc: "Beautiful Lovable template", overlay: 2, seed: "ally" },
+  { title: "Simple Start", desc: "Landing Page", overlay: 2, seed: "simple" }
+];
+
+const grid = document.getElementById('templateGrid');
+templates.forEach((t, i) => {
+  const card = document.createElement('div');
+  card.className = 'reveal';
+  if (i % 3 === 1) card.classList.add('reveal-delay-1');
+  if (i % 3 === 2) card.classList.add('reveal-delay-2');
+  card.innerHTML = `
+    <div class="template-card bg-background rounded-lg relative shadow-inner-glow h-full flex flex-col group overflow-hidden cursor-pointer hover-lift tilt-card" data-tilt>
+      <div class="bg-[#0f0915] overflow-hidden relative aspect-video">
+        <img class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110" alt="${t.title}" src="https://picsum.photos/seed/${t.seed}/800/500"/>
+      </div>
+      <div class="flex-col flex gap-1 p-4 flex-grow">
+        <h3 class="text-violet-100 text-xl font-bold">${t.title}</h3>
+        <div class="flex items-center gap-2 text-muted-foreground text-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+          </svg>
+          <span>${t.desc}</span>
+        </div>
+      </div>
+      <div class="absolute inset-0 z-[-1] pointer-events-none rounded-lg overflow-hidden">
+        <div class="${t.overlay === 1 ? 'overlay-gradient-1' : 'overlay-gradient-2'} opacity-50 absolute inset-0 rounded-lg"></div>
+      </div>
+    </div>`;
+  grid.appendChild(card);
+});
+
+/* ============ LOADER ============ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+    runHeroAnimation();
+  }, 800);
+});
+
+/* ============ HERO ANIMATION (GSAP) ============ */
+function runHeroAnimation() {
+  const tl = gsap.timeline();
+  tl.from('#heroBadge', { y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' })
+    .from('#heroTitle .text-reveal span', { y: '110%', duration: 1, ease: 'power4.out', stagger: 0.15 }, '-=0.4')
+    .from('#heroSub', { y: 20, opacity: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
+    .from('#heroCta', { y: 20, opacity: 0, duration: 0.7, ease: 'power3.out' }, '-=0.4')
+    .from('#heroStats > div', { y: 30, opacity: 0, duration: 0.6, ease: 'power3.out', stagger: 0.1 }, '-=0.3');
+
+  // Counter animation
+  document.querySelectorAll('.counter-num').forEach(el => {
+    const target = parseInt(el.dataset.count);
+    gsap.to(el, {
+      innerText: target,
+      duration: 2,
+      delay: 1.5,
+      ease: 'power2.out',
+      snap: { innerText: 1 },
+      onUpdate: function() {
+        el.innerText = Math.floor(this.targets()[0].innerText).toLocaleString();
+      }
+    });
+  });
+}
+
+/* ============ COUNTDOWN ============ */
+let totalSeconds = 10*3600 + 51*60 + 4;
+const cdEl = document.getElementById('countdown');
+setInterval(() => {
+  if (totalSeconds <= 0) return;
+  totalSeconds--;
+  const h = Math.floor(totalSeconds/3600);
+  const m = Math.floor((totalSeconds%3600)/60);
+  const s = totalSeconds%60;
+  cdEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}, 1000);
+
+/* ============ MOBILE MENU ============ */
+document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+});
+document.querySelectorAll('#mobileMenu a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobileMenu').classList.add('hidden'));
+});
+
+/* ============ NAV ACTIVE STATE ============ */
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = ['hero','features','templates','pricing','contact'].map(id => document.getElementById(id));
+window.addEventListener('scroll', () => {
+  const y = window.scrollY + 200;
+  let current = 'hero';
+  sections.forEach(s => { if (s && s.offsetTop <= y) current = s.id; });
+  navLinks.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+  });
+});
+
+/* ============ CUSTOM CURSOR ============ */
+const cursorDot = document.getElementById('cursorDot');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+});
+
+function animateCursorRing() {
+  ringX += (mouseX - ringX) * 0.15;
+  ringY += (mouseY - ringY) * 0.15;
+  cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(animateCursorRing);
+}
+animateCursorRing();
+
+// Hover states
+document.querySelectorAll('a, button, .template-card, .bento-card, [data-tilt]').forEach(el => {
+  el.addEventListener('mouseenter', () => cursorRing.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursorRing.classList.remove('hover'));
+});
+
+/* ============ PARTICLE CANVAS ============ */
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = (Math.random() - 0.5) * 0.3;
+    this.opacity = Math.random() * 0.5 + 0.2;
+    const colors = ['158,103,250', '254,106,187', '255,156,101'];
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+function initParticles() {
+  particles = [];
+  const count = Math.min(80, Math.floor(canvas.width * canvas.height / 20000));
+  for (let i = 0; i < count; i++) particles.push(new Particle());
+}
+initParticles();
+window.addEventListener('resize', initParticles);
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(158,103,250, ${(1 - dist/120) * 0.15})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawConnections();
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+/* ============ SCROLL REVEAL (Intersection Observer) ============ */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal, .text-reveal').forEach(el => revealObserver.observe(el));
+
+/* ============ MAGNETIC BUTTONS ============ */
+document.querySelectorAll('[data-magnetic]').forEach(el => {
+  el.addEventListener('mousemove', (e) => {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    el.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transform = 'translate(0, 0)';
+  });
+});
+
+/* ============ 3D TILT CARDS ============ */
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+  });
+});
+
+/* ============ GLOW HOVER EFFECT ============ */
+document.querySelectorAll('.glow-hover').forEach(el => {
+  el.addEventListener('mousemove', (e) => {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    el.style.setProperty('--glow-x', x + 'px');
+    el.style.setProperty('--glow-y', y + 'px');
+    const before = el.querySelector('::before');
+  });
+});
+
+/* ============ GSAP SCROLL TRIGGERS ============ */
+gsap.registerPlugin(ScrollTrigger);
+
+// Parallax orbs
+gsap.utils.toArray('.hero-orb').forEach((orb, i) => {
+  gsap.to(orb, {
+    y: -100 - i * 30,
+    scrollTrigger: {
+      trigger: '#hero',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 1
+    }
+  });
+});
+
+// Section dividers glow
+gsap.utils.toArray('.section-divider').forEach(div => {
+  gsap.fromTo(div,
+    { scaleX: 0 },
+    {
+      scaleX: 1,
+      scrollTrigger: {
+        trigger: div,
+        start: 'top 90%',
+        end: 'top 50%',
+        scrub: 1
+      }
+    }
+  );
+});
+
+// Nav background on scroll
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (window.scrollY > 50) {
+    nav.style.background = 'rgba(8, 2, 14, 0.85)';
+  } else {
+    nav.style.background = 'rgba(8, 2, 14, 0.4)';
+  }
+});
+</script>
+</body>
+</html>
+
